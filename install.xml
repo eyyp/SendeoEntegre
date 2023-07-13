@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<modification>
+    <name>Boovi Cargo</name>
+    <code>boovicargo</code>
+    <version>1.0</version>
+    <author>boovicargo</author>
+    <link>test</link>
+    <file path="admin/controller/common/column_left.php">
+    <operation error="skip">
+        <search><![CDATA[$system = array();]]></search>
+        <add position="before"><![CDATA[
+			// Kargo Yönetimi
+			if ($this->user->hasPermission('access', 'extension/shipping/boovicargo')) {
+				$boovicargo[] = array(
+					'name'     => 'Kargo Yönetimi',
+					'href'     => $this->url->link('extension/shipping/boovicargo', 'user_token=' . $this->session->data['user_token'], true),
+					'children' => array()
+				);
+			}
+			// Kargo Ayarları
+			if ($this->user->hasPermission('access', 'extension/shipping/boovicargo')) {
+				$boovicargo[] = array(
+					'name'	   => 'Kargo Ayarları',
+					'href'     => $this->url->link('extension/shipping/boovicargo', 'user_token=' . $this->session->data['user_token'], true),
+					'children' => array()
+				);
+			}
+
+		// Menu General Options
+		if ($boovicargo) {
+				$data['menus'][] = array(
+					'id'       => 'boovicargo',
+					'icon'	   => 'fa-truck',
+					'name'	   => $this->language->get('Boovi Cargo'),
+					'href'     => '',
+					'children' => $boovicargo
+				);
+			}
+		]]></add>
+    </operation>
+</file>
+ <file path="admin/controller/sale/order.php">
+        <operation error="skip">
+            <search><![CDATA[ 'order_id'      => $result['order_id'], ]]></search>
+            <add position="after"><![CDATA[
+				'cargo_buttons' => $this->load->controller('extension/shipping/boovicargo/sendeoButton', $result),
+			]]></add>
+        </operation>
+        <operation error="skip">
+            <search><![CDATA[ $this->load->view('sale/order_invoice ]]></search>
+            <add position="before"><![CDATA[
+				if( isset($this->request->get['for_boovi'])) return $data;
+			]]></add>
+        </operation>
+    </file>
+	    <file path="admin/view/template/sale/order_list.twig">
+        <operation error="skip">
+            <search><![CDATA[ <div class="btn-group"> ]]></search>
+            <add position="before"><![CDATA[ {{ order.cargo_buttons }} ]]></add>
+        </operation>
+    </file>
+</modification>
